@@ -1,20 +1,21 @@
 package main
 
 import (
-	"net/http"
-
 	"github.com/labstack/echo/v4"
-	"github.com/vudung18110263/Practice_Go/controllers"
+	"github.com/vudung18110263/Practice_Go/driver"
+	"github.com/vudung18110263/Practice_Go/src/modules/user/handler"
+	"github.com/vudung18110263/Practice_Go/src/modules/user/repository/repoimpl"
 )
 
 func main() {
+	mongo := driver.ConnectMongoDB("mongodb://localhost:27017")
+	userRepo := repoimpl.NewUserRepoMongo(mongo.Client.Database("go"))
+
 	server := echo.New()
 
-	server.POST("/Login", controllers.Login)
-	server.GET("/", hello)
+	//server.POST("/Login", controllers.Login)
+
+	handler.NewUserHandler(server, userRepo)
 
 	server.Logger.Fatal(server.Start(":8080"))
-}
-func hello(c echo.Context) error {
-	return c.String(http.StatusOK, "Hello word")
 }
