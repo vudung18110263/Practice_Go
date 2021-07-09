@@ -12,3 +12,9 @@ type UserForm struct {
 	Name     string `json:"name"`
 	Password string `json:"password"`
 }
+type DeleteUser struct {
+	Id primitive.ObjectID `json:"id"`
+}
+type LoginResponse struct {
+	Token string `json:"token"`
+}

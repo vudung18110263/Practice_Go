@@ -15,6 +15,8 @@ func main() {
 
 	//server.POST("/Login", controllers.Login)
 
+	//IsLoggedIn := middleware.JWT([]byte("secret"))
+
 	handler.NewUserHandler(server, userRepo)
 
 	server.Logger.Fatal(server.Start(":8080"))
