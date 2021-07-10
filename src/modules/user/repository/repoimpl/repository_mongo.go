@@ -111,7 +111,7 @@ func (r *UserRepoMongo) IsUser(name, password string) (*model.User, bool) {
 		return nil, false
 	}
 	var result model.User
-	fmt.Println(cur)
+	fmt.Println(cur.Err())
 	for cur.Next(context.TODO()) {
 
 		err := cur.Decode(&result)
@@ -119,8 +119,8 @@ func (r *UserRepoMongo) IsUser(name, password string) (*model.User, bool) {
 			return nil, false
 		}
 	}
-	//fmt.Println(result.Id.Hex())
-	if result.Id.Hex() == "000000000000000000000000" {
+	fmt.Println(result.Id.Hex())
+	if cur != nil {
 		return nil, false
 	}
 	return &result, true

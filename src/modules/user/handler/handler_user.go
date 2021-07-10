@@ -32,6 +32,13 @@ func NewUserHandler(e *echo.Echo, ur repository.UserRepository) {
 func (uh *UserHandler) RegisterHandler(c echo.Context) error {
 	req := new(model.UserForm)
 	err := c.Bind(req)
+
+	var IsUser bool
+	_, IsUser = uh.UserRepo.IsUser(req.Name, req.Password)
+	if !IsUser {
+		return c.JSON(http.StatusBadRequest, "false")
+	}
+
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
