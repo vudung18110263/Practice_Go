@@ -35,8 +35,8 @@ func (uh *UserHandler) RegisterHandler(c echo.Context) error {
 
 	var IsUser bool
 	_, IsUser = uh.UserRepo.IsUser(req.Name, req.Password)
-	if !IsUser {
-		return c.JSON(http.StatusBadRequest, "false")
+	if IsUser {
+		return c.JSON(http.StatusBadRequest, "users exist")
 	}
 
 	if err != nil {
