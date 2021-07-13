@@ -15,17 +15,13 @@ func main() {
 	userRepo := repoimpl.NewUserRepoMongo(mongo.Client.Database("go"))
 
 	server := echo.New()
-	server.Use(middleware.Logger())
-	server.Use(middleware.Recover())
+	// server.Use(middleware.Logger())
+	// server.Use(middleware.Recover())
 	server.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowMethods: []string{http.MethodGet, http.MethodPut, http.MethodPost, http.MethodDelete},
 	}))
-
-	//server.POST("/Login", controllers.Login)
-
-	//IsLoggedIn := middleware.JWT([]byte("secret"))
-
-	handler.NewUserHandler(server, userRepo)
-
+	//server.POST("/Login", controllers.Login
+	IsLoggedIn := middleware.JWT([]byte("secret"))
+	handler.NewUserHandler(server, userRepo, IsLoggedIn)
 	server.Logger.Fatal(server.Start(":8080"))
 }

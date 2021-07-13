@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -16,45 +15,61 @@ type UserHandler struct {
 	UserRepo repository.UserRepository
 }
 
-func NewUserHandler(e *echo.Echo, ur repository.UserRepository) {
+func NewUserHandler(e *echo.Echo, ur repository.UserRepository, IsLoggedIn echo.MiddlewareFunc) {
 	uh := &UserHandler{
 		UserRepo: ur,
 	}
+
 	e.POST("/account", uh.RegisterHandler)
-	e.GET("/account/list", uh.FindAllHandler)
-	e.PUT("/account", uh.UpdateUser)
-	e.DELETE("/account", uh.Delete)
-	e.GET("/account/:id/detail", uh.FindUser)
+	e.GET("/account/list", uh.FindAllHandler, IsLoggedIn)
+	e.PUT("/account", uh.UpdateUser, IsLoggedIn)
+	e.DELETE("/account", uh.Delete, IsLoggedIn)
+	e.GET("/account/:id/detail", uh.FindUser, IsLoggedIn)
 	e.POST("/account/SignIn", uh.SignIn)
 	e.POST("/account/Login", uh.Login)
+	e.GET("/account/find/:name", uh.FindUserByName, IsLoggedIn)
 }
+func (uh *UserHandler) FindUserByName(c echo.Context) error {
+	Name := c.Param("name")
 
+	var err error
+	var user *model.User
+
+	user, err = uh.UserRepo.FindByName(Name)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+	return c.JSON(http.StatusOK, user)
+}
 func (uh *UserHandler) RegisterHandler(c echo.Context) error {
 	req := new(model.UserForm)
 	err := c.Bind(req)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
 
-	var IsUser bool
-	_, IsUser = uh.UserRepo.IsUser(req.Name, req.Password)
-	if IsUser {
+	err = uh.UserRepo.IsUserNameExist(req.Name)
+	if err != nil {
 		return c.JSON(http.StatusBadRequest, "users exist")
 	}
 
+	// Create token
+	token := jwt.New(jwt.SigningMethodHS256)
+
+	// Set claims
+	claims := token.Claims.(jwt.MapClaims)
+	claims["name"] = req.Name
+	claims["exp"] = time.Now().Add(time.Minute * 10).Unix()
+
+	// Generate encoded token and send it as response.
+	t, err := token.SignedString([]byte("secret"))
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, err.Error())
+		return err
 	}
-	err = uh.UserRepo.IsUserNameExist(req.Name)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, "username exist")
-	}
-	var user model.User
-	user.Name = req.Name
-	user.Password = req.Password
-	err = uh.UserRepo.Insert(user)
-	if err != nil {
-		fmt.Println(err.Error())
-		return c.JSON(http.StatusBadRequest, err.Error())
-	}
-	return c.JSON(http.StatusCreated, req)
+	return c.JSON(http.StatusOK, &model.LoginResponse{
+		Token: t,
+		Name:  req.Name,
+	})
 }
 
 func (uh *UserHandler) FindAllHandler(c echo.Context) error {
@@ -153,7 +168,6 @@ func (uh *UserHandler) Login(c echo.Context) error {
 	// Set claims
 	claims := token.Claims.(jwt.MapClaims)
 	claims["name"] = req.Name
-	claims["admin"] = false
 	claims["exp"] = time.Now().Add(time.Minute * 10).Unix()
 
 	// Generate encoded token and send it as response.
@@ -163,5 +177,6 @@ func (uh *UserHandler) Login(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, &model.LoginResponse{
 		Token: t,
+		Name:  req.Name,
 	})
 }

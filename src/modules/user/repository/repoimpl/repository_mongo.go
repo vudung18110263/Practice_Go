@@ -15,6 +15,16 @@ import (
 type UserRepoMongo struct {
 	db *mongo.Database
 }
+type MyError struct {
+	a string
+}
+
+func (m *MyError) Error() string {
+	return m.a
+}
+func ErrDo(b string) error {
+	return &MyError{a: b}
+}
 
 func NewUserRepoMongo(db *mongo.Database) repo.UserRepository {
 	return &UserRepoMongo{
@@ -105,31 +115,48 @@ func (r *UserRepoMongo) Find(id string) (*model.User, error) {
 
 	return &result, nil
 }
+func (r *UserRepoMongo) FindByName(name string) (*model.User, error) {
+	cur, err := r.db.Collection("user").Find(context.Background(), bson.M{"name": name})
+	if err != nil {
+		return nil, err
+	}
+
+	var result model.User
+	for cur.Next(context.TODO()) {
+
+		err := cur.Decode(&result)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return &result, nil
+}
 func (r *UserRepoMongo) IsUser(name, password string) (*model.User, bool) {
 	cur, err := r.db.Collection("user").Find(context.Background(), bson.M{"name": name, "password": password})
 	if err != nil {
 		return nil, false
 	}
 	var result model.User
-	fmt.Println(cur.Err())
-	for cur.Next(context.TODO()) {
-
+	//fmt.Println(cur)
+	if cur.Next(context.TODO()) {
 		err := cur.Decode(&result)
+		//fmt.Println(result, "-", err)
 		if err != nil {
 			return nil, false
 		}
+		return &result, true
 	}
-	fmt.Println(result.Id.Hex())
-	if cur != nil {
-		return nil, false
-	}
-	return &result, true
+	return nil, false
 }
 func (r *UserRepoMongo) IsUserNameExist(name string) error {
-	cur, err := r.db.Collection("user").Find(context.Background(), bson.M{"name": name})
+	count, err := r.db.Collection("user").CountDocuments(context.TODO(), bson.M{"name": name})
 	if err != nil {
 		return err
 	}
-	fmt.Println(cur)
+	if count != 0 {
+		err := ErrDo("user exist")
+		return err
+	}
 	return nil
 }
