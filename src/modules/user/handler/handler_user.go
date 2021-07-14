@@ -52,6 +52,13 @@ func (uh *UserHandler) RegisterHandler(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, "users exist")
 	}
+	var user model.User
+	user.Name = req.Name
+	user.Password = req.Password
+	err = uh.UserRepo.Insert(user)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
 
 	// Create token
 	token := jwt.New(jwt.SigningMethodHS256)
