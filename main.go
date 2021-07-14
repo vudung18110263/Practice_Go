@@ -7,7 +7,7 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/vudung18110263/Practice_Go/driver"
 	"github.com/vudung18110263/Practice_Go/src/modules/user/handler"
-	"github.com/vudung18110263/Practice_Go/src/modules/user/repository/repoimpl"
+	"github.com/vudung18110263/Practice_Go/src/modules/user/repoimpl"
 )
 
 func main() {
