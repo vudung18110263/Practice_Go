@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"os"
 
 	"vudung-practice-go/driver"
 	"vudung-practice-go/src/modules/user/handler"
@@ -12,6 +13,7 @@ import (
 )
 
 func main() {
+	os := os.Getenv("PORT")
 	mongo := driver.ConnectMongoDB("mongodb+srv://vudung:vudung@cluster0.su9sk.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
 	userRepo := repoimpl.NewUserRepoMongo(mongo.Client.Database("go"))
 
@@ -24,5 +26,5 @@ func main() {
 	//server.POST("/Login", controllers.Login
 	IsLoggedIn := middleware.JWT([]byte("secret"))
 	handler.NewUserHandler(server, userRepo, IsLoggedIn)
-	server.Logger.Fatal(server.Start(":8080"))
+	server.Logger.Fatal(server.Start(":" + os))
 }
