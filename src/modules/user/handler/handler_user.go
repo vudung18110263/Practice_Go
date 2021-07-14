@@ -5,10 +5,11 @@ import (
 	"strconv"
 	"time"
 
+	"vudung-practice-go/src/modules/user/model"
+	"vudung-practice-go/src/modules/user/repository"
+
 	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo/v4"
-	"github.com/vudung18110263/Practice_Go/src/modules/user/model"
-	"github.com/vudung18110263/Practice_Go/src/modules/user/repository"
 )
 
 type UserHandler struct {
