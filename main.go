@@ -14,7 +14,7 @@ import (
 
 func main() {
 	os := os.Getenv("PORT")
-	mongo := driver.ConnectMongoDB("mongodb+srv://vudung:vudung@cluster0.su9sk.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
+	mongo := driver.ConnectMongoDB("mongodb+srv://truongnv:1234@cluster0.2f1oc.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
 	userRepo := repoimpl.NewUserRepoMongo(mongo.Client.Database("go"))
 
 	server := echo.New()
