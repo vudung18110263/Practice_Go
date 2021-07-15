@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"os"
 
 	"github.com/vudung18110263/Practice_Go/driver"
 	"github.com/vudung18110263/Practice_Go/src/modules/user/handler"
@@ -12,6 +13,7 @@ import (
 )
 
 func main() {
+	os := os.Getenv("PORT")
 	mongo := driver.ConnectMongoDB("mongodb+srv://truongnv:1234@cluster0.2f1oc.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
 	userRepo := repoimpl.NewUserRepoMongo(mongo.Client.Database("go"))
 
@@ -22,7 +24,11 @@ func main() {
 		AllowMethods: []string{http.MethodGet, http.MethodPut, http.MethodPost, http.MethodDelete},
 	}))
 	//server.POST("/Login", controllers.Login
+	server.GET("/", healthCheck)
 	IsLoggedIn := middleware.JWT([]byte("secret"))
 	handler.NewUserHandler(server, userRepo, IsLoggedIn)
-	server.Logger.Fatal(server.Start(":8080"))
+	server.Logger.Fatal(server.Start(":" + os))
+}
+func healthCheck(c echo.Context) error {
+	return c.JSON(http.StatusOK, "ok")
 }
