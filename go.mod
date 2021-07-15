@@ -1,6 +1,7 @@
 module github.com/vudung18110263/Practice_Go
 
 go 1.16
+// +heroku goVersion go 1.15
 
 require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
