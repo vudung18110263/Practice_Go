@@ -1,4 +1,4 @@
-module vudung-practice-go
+module github.com/vudung18110263/Practice_Go
 
 go 1.16
 

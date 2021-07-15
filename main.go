@@ -3,9 +3,9 @@ package main
 import (
 	"net/http"
 
-	"vudung-practice-go/driver"
-	"vudung-practice-go/src/modules/user/handler"
-	"vudung-practice-go/src/modules/user/repoimpl"
+	"github.com/vudung18110263/Practice_Go/driver"
+	"github.com/vudung18110263/Practice_Go/src/modules/user/handler"
+	"github.com/vudung18110263/Practice_Go/src/modules/user/repoimpl"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"

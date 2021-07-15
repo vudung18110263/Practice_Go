@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"vudung-practice-go/src/modules/user/model"
-	repo "vudung-practice-go/src/modules/user/repository"
+	"github.com/vudung18110263/Practice_Go/src/modules/user/model"
+	repo "github.com/vudung18110263/Practice_Go/src/modules/user/repository"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
