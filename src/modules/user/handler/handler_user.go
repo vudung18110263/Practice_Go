@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -29,16 +30,24 @@ func NewUserHandler(e *echo.Echo, ur repository.UserRepository, IsLoggedIn echo.
 	e.POST("/account/SignIn", uh.SignIn)
 	e.POST("/account/Login", uh.Login)
 	e.GET("/account/find/:name", uh.FindUserByName, IsLoggedIn)
+	e.GET("/account/count", uh.FindCountUser, IsLoggedIn)
+}
+func (uh *UserHandler) FindCountUser(c echo.Context) error {
+	err, count := uh.UserRepo.FindCountUser()
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err.Error()+"1")
+	}
+	fmt.Println(count)
+	return c.JSON(http.StatusOK, count)
 }
 func (uh *UserHandler) FindUserByName(c echo.Context) error {
 	Name := c.Param("name")
 
-	var err error
 	var user *model.User
-
-	user, err = uh.UserRepo.FindByName(Name)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, err.Error())
+	var isExist bool
+	user, isExist = uh.UserRepo.FindByName(Name)
+	if !isExist {
+		return c.JSON(http.StatusBadRequest, "Not found")
 	}
 	return c.JSON(http.StatusOK, user)
 }

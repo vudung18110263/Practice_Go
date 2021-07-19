@@ -17,5 +17,6 @@ type UserRepository interface {
 	Find(string) (*model.User, error)
 	IsUser(name, password string) (*model.User, bool)
 	IsUserNameExist(name string) error
-	FindByName(name string) (*model.User, error)
+	FindByName(name string) (*model.User, bool)
+	FindCountUser() (error, int64)
 }

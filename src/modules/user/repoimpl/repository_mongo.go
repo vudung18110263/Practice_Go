@@ -116,22 +116,22 @@ func (r *UserRepoMongo) Find(id string) (*model.User, error) {
 
 	return &result, nil
 }
-func (r *UserRepoMongo) FindByName(name string) (*model.User, error) {
+func (r *UserRepoMongo) FindByName(name string) (*model.User, bool) {
 	cur, err := r.db.Collection("user").Find(context.Background(), bson.M{"name": name})
 	if err != nil {
-		return nil, err
+		return nil, false
 	}
 
 	var result model.User
-	for cur.Next(context.TODO()) {
+	if cur.Next(context.TODO()) {
 
 		err := cur.Decode(&result)
 		if err != nil {
-			return nil, err
+			return nil, false
 		}
+		return &result, true
 	}
-
-	return &result, nil
+	return nil, false
 }
 func (r *UserRepoMongo) IsUser(name, password string) (*model.User, bool) {
 	cur, err := r.db.Collection("user").Find(context.Background(), bson.M{"name": name, "password": password})
@@ -160,4 +160,11 @@ func (r *UserRepoMongo) IsUserNameExist(name string) error {
 		return err
 	}
 	return nil
+}
+func (r *UserRepoMongo) FindCountUser() (error, int64) {
+	count, err := r.db.Collection("user").CountDocuments(context.TODO(), options.Find())
+	if err != nil {
+		return err, 0
+	}
+	return nil, count
 }
